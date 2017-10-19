@@ -6,14 +6,11 @@ namespace ModbusStatus
 {
     public class InputChange : IStateEvent
     {
-        public int InputNumber { get; set; }
-        public bool Value { get; set; }
-        public DateTime Date { get; set; }
+        public DateTime Date { get; private set; }
+        public string Message => $"DI-{InputNumber.ToString("00")} -> {Convert.ToInt32(Value)}";
 
-        public InputChange()
-        {
-
-        }
+        private int InputNumber { get; set; }
+        private bool Value { get; set; }
 
         public InputChange(int inputNumber, bool value, DateTime date)
         {

@@ -2,7 +2,7 @@
   "profiles": {
     "ModbusStatus": {
       "commandName": "Project",
-      "commandLineArgs": "10.20.70.200 22"
+      "commandLineArgs": "10.20.70.200 502"
     }
   }
 }

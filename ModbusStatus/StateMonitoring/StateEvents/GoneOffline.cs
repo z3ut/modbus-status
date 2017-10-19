@@ -4,16 +4,12 @@ using System.Text;
 
 namespace ModbusStatus
 {
-    public class GoneOnline : IStateEvent
+    public class GoneOffline : IStateEvent
     {
         public DateTime Date { get; set; }
+        public string Message => "GONE OFFLINE";
 
-        public GoneOnline()
-        {
-
-        }
-
-        public GoneOnline(DateTime date)
+        public GoneOffline(DateTime date)
         {
             Date = date;
         }
