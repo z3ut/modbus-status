@@ -1,4 +1,5 @@
 ﻿using ModbusStatus.StateMonitoring;
+using ModbusStatus.StateMonitoring.StateEvents;
 using ModbusStatus.UI;
 using ModbusStatus.UI.WindowBorders;
 using NModbus;

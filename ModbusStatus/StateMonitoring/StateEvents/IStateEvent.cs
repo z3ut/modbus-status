@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModbusStatus
+namespace ModbusStatus.StateMonitoring.StateEvents
 {
     public interface IStateEvent
     {

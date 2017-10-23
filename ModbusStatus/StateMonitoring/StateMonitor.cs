@@ -1,4 +1,5 @@
-﻿using ModbusStatus.UI;
+﻿using ModbusStatus.StateMonitoring.StateEvents;
+using ModbusStatus.UI;
 using ModbusStatus.UI.WindowBorders;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,9 @@ namespace ModbusStatus.StateMonitoring
 {
     public class StateMonitor : IStateMonitor
     {
+        //int _deviceStateReader;
+        //IDeviceStateReader _deviceStateReader;
+
         string _ip;
         int _port;
         int _slaveAddress;
@@ -57,6 +61,12 @@ namespace ModbusStatus.StateMonitoring
             {
                 var currentState = GetValues(ip, port, slaveAddress, startAddress, numberOfInputs);
 
+                if (!_isOnline || _isFirstTimeRequest)
+                {
+                    _isFirstTimeRequest = false;
+                    SetOnline();
+                }
+
                 var stateDifferenceEvents = GetStateDifferenceEvents(_previousState, currentState);
 
                 if (stateDifferenceEvents.Any())
@@ -67,12 +77,6 @@ namespace ModbusStatus.StateMonitoring
                 }
 
                 _previousState = currentState;
-
-                if (!_isOnline || _isFirstTimeRequest)
-                {
-                    _isFirstTimeRequest = false;
-                    SetOnline();
-                }
             }
             catch (Exception)
             {
@@ -120,7 +124,7 @@ namespace ModbusStatus.StateMonitoring
         {
             _isOnline = true;
             stateEvents.Add(new GoneOnline(DateTime.Now));
-            stateDisplay.SetOffline();
+            stateDisplay.SetOnline();
             RedrawLog();
         }
 
@@ -128,7 +132,7 @@ namespace ModbusStatus.StateMonitoring
         {
             _isOnline = false;
             stateEvents.Add(new GoneOffline(DateTime.Now));
-            stateDisplay.SetOnline();
+            stateDisplay.SetOffline();
             RedrawLog();
         }
 
