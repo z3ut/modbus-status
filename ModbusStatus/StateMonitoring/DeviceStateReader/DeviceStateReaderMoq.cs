@@ -7,14 +7,8 @@ namespace ModbusStatus.StateMonitoring.DeviceStateReader
 {
     public class DeviceStateReaderMoq : IDeviceStateReader
     {
-        private readonly int _numberOfInputs;
-
-        public DeviceStateReaderMoq(int numberOfInputs)
-        {
-            _numberOfInputs = numberOfInputs;
-        }
-
-        public bool[] ReadValues()
+        public bool[] ReadValues(string ip, int port, int slaveAddress,
+            int startAddress, int numberOfInputs)
         {
             var gen = new Random();
             if (gen.Next(100) > 90)
@@ -22,7 +16,7 @@ namespace ModbusStatus.StateMonitoring.DeviceStateReader
                 throw new Exception();
             }
 
-            return Enumerable.Range(0, _numberOfInputs)
+            return Enumerable.Range(0, numberOfInputs)
                 .Select(s => gen.Next(100) > 50)
                 .ToArray();
         }

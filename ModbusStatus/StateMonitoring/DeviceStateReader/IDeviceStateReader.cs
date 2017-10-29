@@ -6,6 +6,7 @@ namespace ModbusStatus.StateMonitoring.DeviceStateReader
 {
     public interface IDeviceStateReader
     {
-        bool[] ReadValues();
+        bool[] ReadValues(string ip, int port, int slaveAddress,
+            int startAddress, int numberOfInputs);
     }
 }

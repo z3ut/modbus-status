@@ -1,4 +1,5 @@
-﻿using ModbusStatus.StateMonitoring.StateEvents;
+﻿using ModbusStatus.StateMonitoring.DeviceStateReader;
+using ModbusStatus.StateMonitoring.StateEvents;
 using ModbusStatus.UI;
 using ModbusStatus.UI.WindowBorders;
 using System;
@@ -11,9 +12,6 @@ namespace ModbusStatus.StateMonitoring
 {
     public class StateMonitor : IStateMonitor
     {
-        //int _deviceStateReader;
-        //IDeviceStateReader _deviceStateReader;
-
         string _ip;
         int _port;
         int _slaveAddress;
@@ -28,6 +26,7 @@ namespace ModbusStatus.StateMonitoring
         private List<IStateEvent> stateEvents = new List<IStateEvent>();
 
         private IStateDisplay stateDisplay = new StateDisplay(new ConsoleExtensions(), new WindowBorderFancy());
+        private IDeviceStateReader _deviceStateReader;
 
         public StateMonitor(int updatePeriod, string ip, int port, int slaveAddress, int startAddress, int numberOfInputs)
         {
@@ -37,6 +36,8 @@ namespace ModbusStatus.StateMonitoring
             _slaveAddress = slaveAddress;
             _startAddress = startAddress;
             _numberOfInputs = numberOfInputs;
+
+            _deviceStateReader = new DeviceStateReaderMoq();
         }
 
         public void Start()
@@ -50,16 +51,11 @@ namespace ModbusStatus.StateMonitoring
             }
         }
 
-        private void UpdateDeviceTimerCall(object state)
-        {
-            CollectAndDisplayState(_ip, _port, _slaveAddress, _startAddress, _numberOfInputs);
-        }
-
         void CollectAndDisplayState(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs)
         {
             try
             {
-                var currentState = GetValues(ip, port, slaveAddress, startAddress, numberOfInputs);
+                var currentState = _deviceStateReader.ReadValues(ip, port, slaveAddress, startAddress, numberOfInputs);
 
                 if (!_isOnline || _isFirstTimeRequest)
                 {
@@ -96,28 +92,6 @@ namespace ModbusStatus.StateMonitoring
                     yield return (new InputChange(i, currentState[i], DateTime.Now));
                 }
             }
-        }
-
-        bool[] GetValues(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs)
-        {
-#if DEBUG
-            var gen = new Random();
-            if (gen.Next(100) > 90)
-            {
-                throw new Exception();
-            }
-
-            return Enumerable.Range(0, numberOfInputs)
-                .Select(s => gen.Next(100) > 50)
-                .ToArray();
-#else
-            using (var client = new TcpClient(ip, port))
-            {
-                var factory = new ModbusFactory();
-                var master = factory.CreateMaster(client);
-                return master.ReadInputs(slaveAddress, (ushort)startAddress, (ushort)numberOfInputs);
-            }
-#endif
         }
 
         void SetOnline()

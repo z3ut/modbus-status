@@ -40,7 +40,7 @@ namespace ModbusStatus.UI
             {
                 var stateEvent = displayEvents[i];
                 Console.SetCursorPosition(11, 5 + i);
-                Console.Write($"{stateEvent.Date.ToString("HH.mm.ss")} {stateEvent.Message}");
+                Console.Write($"{stateEvent.Date.ToString("yyyy-dd-MM HH.mm.ss")} {stateEvent.Message}");
             }
         }
 
@@ -75,8 +75,12 @@ namespace ModbusStatus.UI
             Console.ResetColor();
 
             _consoleExtensions.DrawForm(0, 0, Console.WindowWidth, 5, _windowBorder);
-            _consoleExtensions.DrawForm(0, 4, 11, Console.WindowHeight - 5, _windowBorder);
-            _consoleExtensions.DrawForm(10, 4, Console.WindowWidth - 10, Console.WindowHeight - 5, _windowBorder);
+
+            _consoleExtensions.DrawForm(0, 4, 11, Console.WindowHeight - 5, _windowBorder.HorizontalSymbol, _windowBorder.VerticalSymbol,
+                _windowBorder.VerticalAndRightSymbol, _windowBorder.TopRightSymbol, _windowBorder.BottomLeftSymbol, _windowBorder.BottomRightSymbol);
+
+            _consoleExtensions.DrawForm(10, 4, Console.WindowWidth - 10, Console.WindowHeight - 5, _windowBorder.HorizontalSymbol, _windowBorder.VerticalSymbol,
+                _windowBorder.HorizontalAndBottomSymbol, _windowBorder.VerticalAndLeftSymbol, _windowBorder.HorizontalAndTopSymbol, _windowBorder.BottomRightSymbol);
         }
 
         private void PrintUiText()
