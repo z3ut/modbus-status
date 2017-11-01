@@ -9,6 +9,8 @@ namespace ModbusStatus.UI
 {
     public class StateDisplay : IStateDisplay
     {
+        private const int MAX_EVENT_COUNT = 100;
+        private List<IStateEvent> _stateEvents = new List<IStateEvent>();
 
         private IConsoleExtensions _consoleExtensions = new ConsoleExtensions();
         private IWindowBorders _windowBorder = new WindowBorderFancy();
@@ -29,12 +31,22 @@ namespace ModbusStatus.UI
             PrintConnectionText(ip, port, slaveAddress, startAddress, numberOfInputs);
         }
 
-        public void SetLog(IEnumerable<IStateEvent> events)
+        public void AddLog(IStateEvent stateEvents)
         {
+            AddLog(new List<IStateEvent>() { stateEvents });
+        }
+
+        public void AddLog(IEnumerable<IStateEvent> stateEvents)
+        {
+            _stateEvents.AddRange(stateEvents);
+            _stateEvents = _stateEvents
+                .Skip(Math.Max(0, _stateEvents.Count() - MAX_EVENT_COUNT))
+                .ToList();
+
             ClearLog();
 
             var numberOfLogsToShow = Console.WindowHeight - 2 - 5;
-            var displayEvents = events.TakeLast(numberOfLogsToShow).ToList();
+            var displayEvents = _stateEvents.TakeLast(numberOfLogsToShow).ToList();
 
             for (var i = 0; i < displayEvents.Count; i++)
             {
@@ -64,7 +76,7 @@ namespace ModbusStatus.UI
             for (var i = 0; i < state.Length; i++)
             {
                 Console.SetCursorPosition(2, i + 5);
-                Console.WriteLine($"DI-{i.ToString("00")}: {Convert.ToInt32(state[i])}");
+                Console.Write($"DI-{i.ToString("00")}: {Convert.ToInt32(state[i])}");
             }
 
             Console.ResetColor();

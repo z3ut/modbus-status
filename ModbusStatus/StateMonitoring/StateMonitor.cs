@@ -12,10 +12,7 @@ namespace ModbusStatus.StateMonitoring
 {
     public class StateMonitor : IStateMonitor
     {
-        private bool[] _currentValues;
         private bool _isInited = false;
-
-        private List<IStateEvent> stateEvents = new List<IStateEvent>();
 
         private IStateDisplay _stateDisplay;
         private ICurrentState _currentState;
@@ -32,12 +29,13 @@ namespace ModbusStatus.StateMonitoring
             _currentState = currentState;
         }
 
-        public void Init(int updatePeriod, string ip, int port, int slaveAddress, int startAddress, int numberOfInputs)
+        public void Init(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs)
         {
             _currentState.Init(ip, port, slaveAddress, startAddress, numberOfInputs);
             _stateDisplay.Initialize(ip, port, slaveAddress, startAddress, numberOfInputs);
 
-            _currentState.OnChange += _currentState_OnChange;
+            _currentState.OnNewState += _currentState_OnNewState;
+            _currentState.OnStateChanges += _currentState_OnStateChanges;
             _currentState.OnGoneOnline += SetOnline;
             _currentState.OnGoneOffline += SetOffline;
 
@@ -58,47 +56,25 @@ namespace ModbusStatus.StateMonitoring
             }
         }
 
-        private void _currentState_OnChange(bool[] values)
+        private void _currentState_OnStateChanges(IDictionary<int, bool> changes)
         {
-            var stateDifferenceEvents = GetStateDifferenceEvents(_currentValues, values);
-
-            if (stateDifferenceEvents.Any())
-            {
-                _currentValues = values;
-                _stateDisplay.SetState(_currentValues);
-                stateEvents.AddRange(stateDifferenceEvents);
-                RedrawLog();
-            }
+            _stateDisplay.AddLog(changes.Select(c => new InputChange(c.Key, c.Value, DateTime.Now)));
         }
 
-        private IEnumerable<IStateEvent> GetStateDifferenceEvents(bool[] previousState, bool[] currentState)
+        private void _currentState_OnNewState(bool[] values)
         {
-            for (var i = 0; i < currentState.Length; i++)
-            {
-                if (previousState == null || previousState[i] != currentState[i])
-                {
-                    yield return (new InputChange(i, currentState[i], DateTime.Now));
-                }
-            }
+            _stateDisplay.SetState(values);
         }
 
         void SetOnline()
         {
-            stateEvents.Add(new GoneOnline(DateTime.Now));
+            _stateDisplay.AddLog(new GoneOnline(DateTime.Now));
             _stateDisplay.SetOnline();
-            RedrawLog();
         }
 
         void SetOffline()
         {
-            stateEvents.Add(new GoneOffline(DateTime.Now));
-            _stateDisplay.SetOffline();
-            RedrawLog();
-        }
-
-        void RedrawLog()
-        {
-            _stateDisplay.SetLog(stateEvents);
+            _stateDisplay.AddLog(new GoneOffline(DateTime.Now));
         }
     }
 }

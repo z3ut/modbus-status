@@ -8,16 +8,16 @@ namespace ModbusStatus.StateMonitoring
 {
     class CurrentState : ICurrentState
     {
-        public event NewState OnChange;
+        public event NewState OnNewState;
         public event Action OnGoneOnline;
         public event Action OnGoneOffline;
+        public event StateChanges OnStateChanges;
 
         private string _ip;
         private int _port;
         private int _slaveAddress;
         private int _startAddress;
         private int _numberOfInputs;
-        private int _updatePeriod;
 
         private readonly IDeviceStateReader _deviceStateReader;
 
@@ -63,8 +63,10 @@ namespace ModbusStatus.StateMonitoring
 
                 if (_currentState == null || !_currentState.SequenceEqual(newState))
                 {
+                    var stateDifferences = GetStateDifferences(_currentState, newState);
                     _currentState = newState;
-                    OnChange?.Invoke(_currentState);
+                    OnNewState?.Invoke(_currentState);
+                    OnStateChanges?.Invoke(stateDifferences);
                 }
             }
             catch (Exception)
@@ -77,6 +79,20 @@ namespace ModbusStatus.StateMonitoring
             }
 
             _isFirstUpdate = false;
+        }
+
+        private IDictionary<int, bool> GetStateDifferences(
+            bool[] previousState, bool[] currentState)
+        {
+            var changes = new Dictionary<int, bool>();
+            for (var i = 0; i < currentState.Length; i++)
+            {
+                if (previousState == null || previousState[i] != currentState[i])
+                {
+                    changes.Add(i, currentState[i]);
+                }
+            }
+            return changes;
         }
     }
 }

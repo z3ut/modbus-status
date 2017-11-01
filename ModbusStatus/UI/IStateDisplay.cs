@@ -9,7 +9,8 @@ namespace ModbusStatus.UI
     {
         void Initialize(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs);
         void SetState(bool[] state);
-        void SetLog(IEnumerable<IStateEvent> events);
+        void AddLog(IStateEvent stateEvent);
+        void AddLog(IEnumerable<IStateEvent> stateEvents);
         void SetOnline();
         void SetOffline();
     }
