@@ -34,7 +34,8 @@ namespace ModbusStatus
         {
             ValidateAndParseUserInput(args);
 
-            var stateMonitor = new StateMonitor(updatePeriod, deviceIp, devicePort, slaveAddress, startAddress, numberOfInputs);
+            var stateMonitor = new StateMonitor();
+            stateMonitor.Init(updatePeriod, deviceIp, devicePort, slaveAddress, startAddress, numberOfInputs);
             stateMonitor.Start();
         }
 

@@ -6,6 +6,7 @@ namespace ModbusStatus.StateMonitoring
 {
     public interface IStateMonitor
     {
-        void Start();
+        void Init(int updatePeriod, string ip, int port, int slaveAddress, int startAddress, int numberOfInputs);
+        void Start(int updatePeriod);
     }
 }

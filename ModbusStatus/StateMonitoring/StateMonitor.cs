@@ -12,78 +12,66 @@ namespace ModbusStatus.StateMonitoring
 {
     public class StateMonitor : IStateMonitor
     {
-        string _ip;
-        int _port;
-        int _slaveAddress;
-        int _startAddress;
-        int _numberOfInputs;
-        int _updatePeriod;
-
-        bool[] _previousState;
-        bool _isFirstTimeRequest = true;
-        bool _isOnline = false;
+        private bool[] _currentValues;
+        private bool _isInited = false;
 
         private List<IStateEvent> stateEvents = new List<IStateEvent>();
 
-        private IStateDisplay stateDisplay = new StateDisplay(new ConsoleExtensions(), new WindowBorderFancy());
-        private IDeviceStateReader _deviceStateReader;
+        private IStateDisplay _stateDisplay;
+        private ICurrentState _currentState;
 
-        public StateMonitor(int updatePeriod, string ip, int port, int slaveAddress, int startAddress, int numberOfInputs)
+        public StateMonitor()
         {
-            _updatePeriod = updatePeriod;
-            _ip = ip;
-            _port = port;
-            _slaveAddress = slaveAddress;
-            _startAddress = startAddress;
-            _numberOfInputs = numberOfInputs;
-
-            _deviceStateReader = new DeviceStateReaderMoq();
+            _stateDisplay =  new StateDisplay(new ConsoleExtensions(), new WindowBorderFancy());
+            _currentState = new CurrentState(new DeviceStateReaderMoq());
         }
 
-        public void Start()
+        public StateMonitor(IStateDisplay stateDisplay, ICurrentState currentState)
         {
-            stateDisplay.Initialize(_ip, _port, _slaveAddress, _startAddress, _numberOfInputs);
+            _stateDisplay = stateDisplay;
+            _currentState = currentState;
+        }
+
+        public void Init(int updatePeriod, string ip, int port, int slaveAddress, int startAddress, int numberOfInputs)
+        {
+            _currentState.Init(ip, port, slaveAddress, startAddress, numberOfInputs);
+            _stateDisplay.Initialize(ip, port, slaveAddress, startAddress, numberOfInputs);
+
+            _currentState.OnChange += _currentState_OnChange;
+            _currentState.OnGoneOnline += SetOnline;
+            _currentState.OnGoneOffline += SetOffline;
+
+            _isInited = true;
+        }
+
+        public void Start(int updatePeriod)
+        {
+            if (!_isInited)
+            {
+                throw new Exception("StateMonitor must be inited before update");
+            }
 
             for (; ; )
             {
-                CollectAndDisplayState(_ip, _port, _slaveAddress, _startAddress, _numberOfInputs);
-                Thread.Sleep(_updatePeriod);
+                _currentState.Update();
+                Thread.Sleep(updatePeriod);
             }
         }
 
-        void CollectAndDisplayState(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs)
+        private void _currentState_OnChange(bool[] values)
         {
-            try
+            var stateDifferenceEvents = GetStateDifferenceEvents(_currentValues, values);
+
+            if (stateDifferenceEvents.Any())
             {
-                var currentState = _deviceStateReader.ReadValues(ip, port, slaveAddress, startAddress, numberOfInputs);
-
-                if (!_isOnline || _isFirstTimeRequest)
-                {
-                    _isFirstTimeRequest = false;
-                    SetOnline();
-                }
-
-                var stateDifferenceEvents = GetStateDifferenceEvents(_previousState, currentState);
-
-                if (stateDifferenceEvents.Any())
-                {
-                    stateDisplay.SetState(currentState);
-                    stateEvents.AddRange(stateDifferenceEvents);
-                    RedrawLog();
-                }
-
-                _previousState = currentState;
-            }
-            catch (Exception)
-            {
-                if (_isOnline)
-                {
-                    SetOffline();
-                }
+                _currentValues = values;
+                _stateDisplay.SetState(_currentValues);
+                stateEvents.AddRange(stateDifferenceEvents);
+                RedrawLog();
             }
         }
 
-        IEnumerable<IStateEvent> GetStateDifferenceEvents(bool[] previousState, bool[] currentState)
+        private IEnumerable<IStateEvent> GetStateDifferenceEvents(bool[] previousState, bool[] currentState)
         {
             for (var i = 0; i < currentState.Length; i++)
             {
@@ -96,23 +84,21 @@ namespace ModbusStatus.StateMonitoring
 
         void SetOnline()
         {
-            _isOnline = true;
             stateEvents.Add(new GoneOnline(DateTime.Now));
-            stateDisplay.SetOnline();
+            _stateDisplay.SetOnline();
             RedrawLog();
         }
 
         void SetOffline()
         {
-            _isOnline = false;
             stateEvents.Add(new GoneOffline(DateTime.Now));
-            stateDisplay.SetOffline();
+            _stateDisplay.SetOffline();
             RedrawLog();
         }
 
         void RedrawLog()
         {
-            stateDisplay.SetLog(stateEvents);
+            _stateDisplay.SetLog(stateEvents);
         }
     }
 }
