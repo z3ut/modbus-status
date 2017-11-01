@@ -1,8 +1,6 @@
 ﻿using ModbusStatus.StateMonitoring;
-using ModbusStatus.StateMonitoring.StateEvents;
+using ModbusStatus.StateEvents;
 using ModbusStatus.UI;
-using ModbusStatus.UI.WindowBorders;
-using NModbus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,16 +17,6 @@ namespace ModbusStatus
         static int slaveAddress = 0;
         static int startAddress = 0;
         static int numberOfInputs = 16;
-        static bool[] previousState;
-        static bool isFirstTimeRequest = true;
-        static bool isOnline = false;
-
-        static List<IStateEvent> stateEvents = new List<IStateEvent>();
-
-        static IConsoleExtensions consoleExtensions = new ConsoleExtensions();
-        static IWindowBorders windowBorder = new WindowBorderFancy();
-
-        static IStateDisplay stateDisplay = new StateDisplay(consoleExtensions, windowBorder);
 
         static void Main(string[] args)
         {

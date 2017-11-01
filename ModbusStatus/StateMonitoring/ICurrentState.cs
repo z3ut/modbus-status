@@ -1,4 +1,4 @@
-﻿using ModbusStatus.StateMonitoring.StateEvents;
+﻿using ModbusStatus.StateEvents;
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -1,4 +1,4 @@
-﻿using ModbusStatus.StateMonitoring.StateEvents;
+﻿using ModbusStatus.StateEvents;
 using ModbusStatus.UI.WindowBorders;
 using System;
 using System.Collections.Generic;
@@ -92,8 +92,8 @@ namespace ModbusStatus.UI
                 _windowBorder, topLeftSymbol: _windowBorder.VerticalAndRightSymbol);
 
             _consoleExtensions.DrawForm(11, 4, Console.WindowWidth - 11,
-                Console.WindowHeight - 5, _windowBorder.HorizontalSymbol,
-                _windowBorder.VerticalSymbol,
+                Console.WindowHeight - 5, _windowBorder,
+                _windowBorder.HorizontalSymbol, _windowBorder.VerticalSymbol,
                 topLeftSymbol: _windowBorder.HorizontalAndBottomSymbol,
                 topRightSymbol: _windowBorder.VerticalAndLeftSymbol,
                 bottomLeftSymbol: _windowBorder.HorizontalAndTopSymbol);
