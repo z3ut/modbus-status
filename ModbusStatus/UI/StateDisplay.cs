@@ -1,5 +1,6 @@
 ﻿using ModbusStatus.StateEvents;
-using ModbusStatus.UI.WindowBorders;
+using ModbusStatus.UI.Shared;
+using ModbusStatus.UI.Shared.WindowBorders;
 using System;
 using System.Collections.Generic;
 using System.Linq;

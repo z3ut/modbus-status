@@ -1,9 +1,9 @@
-﻿using ModbusStatus.UI.WindowBorders;
+﻿using ModbusStatus.UI.Shared.WindowBorders;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModbusStatus.UI
+namespace ModbusStatus.UI.Shared
 {
     public class ConsoleExtensions : IConsoleExtensions
     {

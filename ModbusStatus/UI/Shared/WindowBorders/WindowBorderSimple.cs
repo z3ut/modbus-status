@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModbusStatus.UI.WindowBorders
+namespace ModbusStatus.UI.Shared.WindowBorders
 {
     public class WindowBorderSimple : IWindowBorders
     {
