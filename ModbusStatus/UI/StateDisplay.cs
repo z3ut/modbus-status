@@ -39,7 +39,7 @@ namespace ModbusStatus.UI
             for (var i = 0; i < displayEvents.Count; i++)
             {
                 var stateEvent = displayEvents[i];
-                Console.SetCursorPosition(11, 5 + i);
+                Console.SetCursorPosition(12, 5 + i);
                 Console.Write($"{stateEvent.Date.ToString("yyyy-dd-MM HH.mm.ss")} {stateEvent.Message}");
             }
         }
@@ -63,7 +63,7 @@ namespace ModbusStatus.UI
 
             for (var i = 0; i < state.Length; i++)
             {
-                Console.SetCursorPosition(1, i + 5);
+                Console.SetCursorPosition(2, i + 5);
                 Console.WriteLine($"DI-{i.ToString("00")}: {Convert.ToInt32(state[i])}");
             }
 
@@ -76,10 +76,10 @@ namespace ModbusStatus.UI
 
             _consoleExtensions.DrawForm(0, 0, Console.WindowWidth, 5, _windowBorder);
 
-            _consoleExtensions.DrawForm(0, 4, 11, Console.WindowHeight - 5, _windowBorder.HorizontalSymbol, _windowBorder.VerticalSymbol,
+            _consoleExtensions.DrawForm(0, 4, 12, Console.WindowHeight - 5, _windowBorder.HorizontalSymbol, _windowBorder.VerticalSymbol,
                 _windowBorder.VerticalAndRightSymbol, _windowBorder.TopRightSymbol, _windowBorder.BottomLeftSymbol, _windowBorder.BottomRightSymbol);
 
-            _consoleExtensions.DrawForm(10, 4, Console.WindowWidth - 10, Console.WindowHeight - 5, _windowBorder.HorizontalSymbol, _windowBorder.VerticalSymbol,
+            _consoleExtensions.DrawForm(11, 4, Console.WindowWidth - 11, Console.WindowHeight - 5, _windowBorder.HorizontalSymbol, _windowBorder.VerticalSymbol,
                 _windowBorder.HorizontalAndBottomSymbol, _windowBorder.VerticalAndLeftSymbol, _windowBorder.HorizontalAndTopSymbol, _windowBorder.BottomRightSymbol);
         }
 
@@ -124,7 +124,7 @@ namespace ModbusStatus.UI
 
         private void ClearLog()
         {
-            _consoleExtensions.ClearBox(11, 5, Console.WindowWidth - 12, Console.WindowHeight - 7);
+            _consoleExtensions.ClearBox(12, 5, Console.WindowWidth - 13, Console.WindowHeight - 7);
         }
 
         private void ClearConnectionStatus()
