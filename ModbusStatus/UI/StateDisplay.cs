@@ -76,11 +76,15 @@ namespace ModbusStatus.UI
 
             _consoleExtensions.DrawForm(0, 0, Console.WindowWidth, 5, _windowBorder);
 
-            _consoleExtensions.DrawForm(0, 4, 12, Console.WindowHeight - 5, _windowBorder.HorizontalSymbol, _windowBorder.VerticalSymbol,
-                _windowBorder.VerticalAndRightSymbol, _windowBorder.TopRightSymbol, _windowBorder.BottomLeftSymbol, _windowBorder.BottomRightSymbol);
+            _consoleExtensions.DrawForm(0, 4, 12, Console.WindowHeight - 5,
+                _windowBorder, topLeftSymbol: _windowBorder.VerticalAndRightSymbol);
 
-            _consoleExtensions.DrawForm(11, 4, Console.WindowWidth - 11, Console.WindowHeight - 5, _windowBorder.HorizontalSymbol, _windowBorder.VerticalSymbol,
-                _windowBorder.HorizontalAndBottomSymbol, _windowBorder.VerticalAndLeftSymbol, _windowBorder.HorizontalAndTopSymbol, _windowBorder.BottomRightSymbol);
+            _consoleExtensions.DrawForm(11, 4, Console.WindowWidth - 11,
+                Console.WindowHeight - 5, _windowBorder.HorizontalSymbol,
+                _windowBorder.VerticalSymbol,
+                topLeftSymbol: _windowBorder.HorizontalAndBottomSymbol,
+                topRightSymbol: _windowBorder.VerticalAndLeftSymbol,
+                bottomLeftSymbol: _windowBorder.HorizontalAndTopSymbol);
         }
 
         private void PrintUiText()

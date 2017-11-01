@@ -21,47 +21,56 @@ namespace ModbusStatus.UI
         }
 
         public void DrawForm(int left, int top, int width, int height,
-            IWindowBorders windowBorders)
-        {
-            char horizontalChar = windowBorders.HorizontalSymbol;
-            char verticalChar = windowBorders.VerticalSymbol;
-            char topLeftChar = windowBorders.TopLeftSymbol;
-            char topRightChar = windowBorders.TopRightSymbol;
-            char bottomLeftChar = windowBorders.BottomLeftSymbol;
-            char bottomRightChar = windowBorders.BottomRightSymbol;
-
-            DrawForm(left, top, width, height, horizontalChar, verticalChar,
-                topLeftChar, topRightChar, bottomLeftChar, bottomRightChar);
-        }
-
-        public void DrawForm(int left, int top, int width, int height,
-            char horizontalChar = '-', char verticalChar = '|',
-            char topLeftChar = '#', char topRightChar = '#',
-            char bottomLeftChar = '#', char bottomRightChar = '#')
+            char horizontalSymbol = '-', char verticalSymbol = '|',
+            char topLeftSymbol = '#', char topRightSymbol = '#',
+            char bottomLeftSymbol = '#', char bottomRightSymbol = '#')
         {
             Console.ResetColor();
 
-            var horizontalLine = new string(horizontalChar, width - 2);
+            var horizontalLine = new string(horizontalSymbol, width - 2);
 
             Console.SetCursorPosition(left, top);
-            Console.Write(topLeftChar);
+            Console.Write(topLeftSymbol);
             Console.Write(horizontalLine);
-            Console.Write(topRightChar);
+            Console.Write(topRightSymbol);
 
             Console.SetCursorPosition(left, top + height - 1);
-            Console.Write(bottomLeftChar);
+            Console.Write(bottomLeftSymbol);
             Console.Write(horizontalLine);
-            Console.Write(bottomRightChar);
+            Console.Write(bottomRightSymbol);
 
             for (var i = 1; i < height - 1; i++)
             {
                 Console.SetCursorPosition(left, top + i);
-                Console.Write(verticalChar);
+                Console.Write(verticalSymbol);
 
                 Console.SetCursorPosition(left + width - 1, top + i);
-                Console.Write(verticalChar);
+                Console.Write(verticalSymbol);
             }
+        }
 
+        public void DrawForm(int left, int top, int width, int height,
+            char horizontalSymbol = '-', char verticalSymbol = '|', char cornerSymbol = '#')
+        {
+            DrawForm(left, top, width, height, horizontalSymbol, verticalSymbol,
+                cornerSymbol, cornerSymbol, cornerSymbol, cornerSymbol);
+        }
+
+        public void DrawForm(int left, int top, int width, int height,
+            IWindowBorders windowBorders,
+            char? horizontalSymbol = null, char? verticalSymbol = null,
+            char? topLeftSymbol = null, char? topRightSymbol = null,
+            char? bottomLeftSymbol = null, char? bottomRightSymbol = null)
+        {
+            var horizontalSymbolValue = horizontalSymbol ?? windowBorders.HorizontalSymbol;
+            var verticalSymbolValue = verticalSymbol ?? windowBorders.VerticalSymbol;
+            var topLeftSymbolValue = topLeftSymbol ?? windowBorders.TopLeftSymbol;
+            var topRightValue = topRightSymbol ?? windowBorders.TopRightSymbol;
+            var bottomLeftValue = bottomLeftSymbol ?? windowBorders.BottomLeftSymbol;
+            var bottomRightValue = bottomRightSymbol ?? windowBorders.BottomRightSymbol;
+
+            DrawForm(left, top, width, height, horizontalSymbolValue, verticalSymbolValue,
+                topLeftSymbolValue, topRightValue, bottomLeftValue, bottomRightValue);
         }
     }
 }
