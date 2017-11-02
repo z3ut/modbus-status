@@ -20,6 +20,7 @@ namespace ModbusStatus.UI
 
         private const string ONLINE_TEXT = "ONLINE";
         private const string OFFLINE_TEXT = "OFFLINE";
+        private int CONNECTION_STATUS_MAX_LENGTH = Math.Max(ONLINE_TEXT.Length, OFFLINE_TEXT.Length);
 
         private const ConsoleColor ONLINE_COLOR = ConsoleColor.Green;
         private const ConsoleColor ONLINE_BACKGROUND_COLOR = ConsoleColor.DarkGreen;
@@ -30,6 +31,26 @@ namespace ModbusStatus.UI
         private const ConsoleColor STATE_COLOR = ConsoleColor.DarkMagenta;
         private const ConsoleColor STATE_BACKGROUND_COLOR = ConsoleColor.DarkYellow;
 
+        private WindowPosition _statusTextWindow;
+        private WindowPosition _stateTextWindow;
+        private WindowPosition _logTextWindow;
+
+        private const string TEXT_IP = "IP:";
+        private const string TEXT_PORT = "PORT:";
+        private const string TEXT_SLAVE_ADDRESS = "SLAVE ADDRESS:";
+        private const string TEXT_START_ADDRESS = "START ADDRESS:";
+        private const string TEXT_NUMBER_OF_INPUTS = "NUMBER OF INPUTS:";
+        private const string TEXT_STATUS = "STATUS:";
+
+        private const int STATUS_COLUMN_WIDTH = 18;
+
+        private CursorPosition textIpPosition;
+        private CursorPosition textPortPosition;
+        private CursorPosition textSlaveAddressPosition;
+        private CursorPosition textStartAddressPosition;
+        private CursorPosition textNumberOfInputsPosition;
+        private CursorPosition textConnectionStatusPosition;
+
         public StateDisplay(IConsoleExtensions consoleExtensions, IWindowBorders windowBorders)
         {
             _consoleExtensions = consoleExtensions;
@@ -39,6 +60,23 @@ namespace ModbusStatus.UI
         public void Initialize(string ip, int port, int slaveAddress,
             int startAddress, int numberOfInputs)
         {
+            _statusTextWindow = new WindowPosition(0, 0, Console.WindowWidth, 5, 1);
+            _stateTextWindow = new WindowPosition(0, 4, 12, Console.WindowHeight - 5, 1);
+            _logTextWindow = new WindowPosition(11, 4, Console.WindowWidth - 11,
+                Console.WindowHeight - 5, 1);
+
+            // first row
+            textIpPosition = new CursorPosition(_statusTextWindow.ContentLeft, _statusTextWindow.ContentTop);
+            textPortPosition = new CursorPosition(_statusTextWindow.ContentLeft + STATUS_COLUMN_WIDTH, _statusTextWindow.ContentTop);
+
+            // second row
+            textSlaveAddressPosition = new CursorPosition(_statusTextWindow.ContentLeft, _statusTextWindow.ContentTop + 1);
+            textStartAddressPosition = new CursorPosition(_statusTextWindow.ContentLeft + STATUS_COLUMN_WIDTH, _statusTextWindow.ContentTop + 1);
+            textNumberOfInputsPosition = new CursorPosition(_statusTextWindow.ContentLeft + STATUS_COLUMN_WIDTH * 2, _statusTextWindow.ContentTop + 1);
+
+            // third row
+            textConnectionStatusPosition = new CursorPosition(_statusTextWindow.ContentLeft, _statusTextWindow.ContentTop + 2);
+
             Console.CursorVisible = false;
             //Console.SetBufferSize(Console.WindowWidth, Console.WindowHeight);
             Console.Clear();
@@ -61,26 +99,24 @@ namespace ModbusStatus.UI
 
             ClearLog();
 
-            var numberOfLogsToShow = Console.WindowHeight - 2 - 5;
+            var numberOfLogsToShow = _logTextWindow.ContentHeight;
             var displayEvents = _stateEvents.TakeLast(numberOfLogsToShow).ToList();
 
             for (var i = 0; i < displayEvents.Count; i++)
             {
                 var stateEvent = displayEvents[i];
-                Console.SetCursorPosition(12, 5 + i);
+                Console.SetCursorPosition(_logTextWindow.ContentLeft, _logTextWindow.ContentTop + i);
                 Console.Write($"{stateEvent.Date.ToString(LOG_DATE_FORMAT)} {stateEvent.Message}");
             }
         }
 
         public void SetOffline()
         {
-            ClearConnectionStatus();
             PrintConnectionStatus(OFFLINE_TEXT, OFFLINE_COLOR, OFFLINE_BACKGROUND_COLOR);
         }
 
         public void SetOnline()
         {
-            ClearConnectionStatus();
             PrintConnectionStatus(ONLINE_TEXT, ONLINE_COLOR, ONLINE_BACKGROUND_COLOR);
         }
 
@@ -91,7 +127,7 @@ namespace ModbusStatus.UI
 
             for (var i = 0; i < state.Length; i++)
             {
-                Console.SetCursorPosition(2, i + 5);
+                Console.SetCursorPosition(_stateTextWindow.ContentLeft + 1, _stateTextWindow.ContentTop + i);
                 Console.Write($"DI-{i.ToString("00")}: {Convert.ToInt32(state[i])}");
             }
 
@@ -102,13 +138,16 @@ namespace ModbusStatus.UI
         {
             Console.ResetColor();
 
-            _consoleExtensions.DrawForm(0, 0, Console.WindowWidth, 5, _windowBorder);
+            _consoleExtensions.DrawForm(_statusTextWindow.BorderLeft, _statusTextWindow.BorderTop,
+                _statusTextWindow.TotalWidth, _statusTextWindow.TotalHeight, _windowBorder);
 
-            _consoleExtensions.DrawForm(0, 4, 12, Console.WindowHeight - 5,
-                _windowBorder, topLeftSymbol: _windowBorder.VerticalAndRightSymbol);
+            _consoleExtensions.DrawForm(_stateTextWindow.BorderLeft, _stateTextWindow.BorderTop,
+                _stateTextWindow.TotalWidth, _stateTextWindow.TotalHeight, _windowBorder,
+                topLeftSymbol: _windowBorder.VerticalAndRightSymbol);
 
-            _consoleExtensions.DrawForm(11, 4, Console.WindowWidth - 11,
-                Console.WindowHeight - 5, _windowBorder,
+            _consoleExtensions.DrawForm(_logTextWindow.BorderLeft,
+                _logTextWindow.BorderTop, _logTextWindow.TotalWidth,
+                _logTextWindow.TotalHeight, _windowBorder,
                 _windowBorder.HorizontalSymbol, _windowBorder.VerticalSymbol,
                 topLeftSymbol: _windowBorder.HorizontalAndBottomSymbol,
                 topRightSymbol: _windowBorder.VerticalAndLeftSymbol,
@@ -119,20 +158,23 @@ namespace ModbusStatus.UI
         {
             Console.ResetColor();
 
-            Console.SetCursorPosition(1, 1);
-            Console.Write("IP:");
+            Console.SetCursorPosition(textIpPosition.Left, textIpPosition.Top);
+            Console.Write(TEXT_IP);
 
-            Console.SetCursorPosition(20, 1);
-            Console.Write("PORT:");
+            Console.SetCursorPosition(textPortPosition.Left, textPortPosition.Top);
+            Console.Write(TEXT_PORT);
 
-            Console.SetCursorPosition(1, 2);
-            Console.Write("START ADDRESS:");
+            Console.SetCursorPosition(textSlaveAddressPosition.Left, textSlaveAddressPosition.Top);
+            Console.Write(TEXT_SLAVE_ADDRESS);
 
-            Console.SetCursorPosition(20, 2);
-            Console.Write("NUMBER OF INPUTS:");
+            Console.SetCursorPosition(textStartAddressPosition.Left, textStartAddressPosition.Top);
+            Console.Write(TEXT_START_ADDRESS);
 
-            Console.SetCursorPosition(1, 3);
-            Console.Write("STATUS:");
+            Console.SetCursorPosition(textNumberOfInputsPosition.Left, textNumberOfInputsPosition.Top);
+            Console.Write(TEXT_NUMBER_OF_INPUTS);
+
+            Console.SetCursorPosition(textConnectionStatusPosition.Left, textConnectionStatusPosition.Top);
+            Console.Write(TEXT_STATUS);
         }
 
         private void PrintConnectionText(string ip, int port, int slaveAddress,
@@ -140,37 +182,34 @@ namespace ModbusStatus.UI
         {
             Console.ResetColor();
 
-            Console.SetCursorPosition(4, 1);
+            Console.SetCursorPosition(textIpPosition.Left + TEXT_IP.Length, textIpPosition.Top);
             Console.Write(ip);
 
-            Console.SetCursorPosition(25, 1);
+            Console.SetCursorPosition(textPortPosition.Left + TEXT_PORT.Length, textPortPosition.Top);
             Console.Write(port);
 
-            // TODO: slave address
+            Console.SetCursorPosition(textSlaveAddressPosition.Left + TEXT_SLAVE_ADDRESS.Length, textSlaveAddressPosition.Top);
+            Console.Write(slaveAddress);
 
-            Console.SetCursorPosition(15, 2);
+            Console.SetCursorPosition(textStartAddressPosition.Left + TEXT_START_ADDRESS.Length, textStartAddressPosition.Top);
             Console.Write(startAddress);
 
-            Console.SetCursorPosition(37, 2);
+            Console.SetCursorPosition(textNumberOfInputsPosition.Left + TEXT_NUMBER_OF_INPUTS.Length, textNumberOfInputsPosition.Top);
             Console.Write(numberOfInputs);
         }
 
         private void ClearLog()
         {
-            _consoleExtensions.ClearBox(12, 5, Console.WindowWidth - 13,
-                Console.WindowHeight - 7);
-        }
-
-        private void ClearConnectionStatus()
-        {
-            var clearLength = Math.Max(ONLINE_TEXT.Length, OFFLINE_TEXT.Length);
-            _consoleExtensions.ClearBox(8, 3, clearLength, 1);
+            _consoleExtensions.ClearBox(_logTextWindow.ContentLeft, _logTextWindow.ContentTop,
+                _logTextWindow.ContentWidth, _logTextWindow.ContentHeight);
         }
 
         private void PrintConnectionStatus(string status,
             ConsoleColor backgroundColor, ConsoleColor foregroundColor)
         {
-            Console.SetCursorPosition(8, 3);
+            _consoleExtensions.ClearBox(textConnectionStatusPosition.Left + CONNECTION_STATUS_MAX_LENGTH, textConnectionStatusPosition.Top, CONNECTION_STATUS_MAX_LENGTH, 1);
+
+            Console.SetCursorPosition(textConnectionStatusPosition.Left + CONNECTION_STATUS_MAX_LENGTH, textConnectionStatusPosition.Top);
             Console.BackgroundColor = backgroundColor;
             Console.ForegroundColor = foregroundColor;
             Console.Write(status);
