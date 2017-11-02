@@ -10,11 +10,25 @@ namespace ModbusStatus.UI
 {
     public class StateDisplay : IStateDisplay
     {
+        private IConsoleExtensions _consoleExtensions;
+        private IWindowBorders _windowBorder;
+
         private const int MAX_EVENT_COUNT = 100;
         private List<IStateEvent> _stateEvents = new List<IStateEvent>();
 
-        private IConsoleExtensions _consoleExtensions = new ConsoleExtensions();
-        private IWindowBorders _windowBorder = new WindowBorderFancy();
+        private const string LOG_DATE_FORMAT = "yyyy-dd-MM HH.mm.ss";
+
+        private const string ONLINE_TEXT = "ONLINE";
+        private const string OFFLINE_TEXT = "OFFLINE";
+
+        private const ConsoleColor ONLINE_COLOR = ConsoleColor.Green;
+        private const ConsoleColor ONLINE_BACKGROUND_COLOR = ConsoleColor.DarkGreen;
+
+        private const ConsoleColor OFFLINE_COLOR = ConsoleColor.Gray;
+        private const ConsoleColor OFFLINE_BACKGROUND_COLOR = ConsoleColor.DarkGray;
+
+        private const ConsoleColor STATE_COLOR = ConsoleColor.DarkMagenta;
+        private const ConsoleColor STATE_BACKGROUND_COLOR = ConsoleColor.DarkYellow;
 
         public StateDisplay(IConsoleExtensions consoleExtensions, IWindowBorders windowBorders)
         {
@@ -22,7 +36,8 @@ namespace ModbusStatus.UI
             _windowBorder = windowBorders;
         }
 
-        public void Initialize(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs)
+        public void Initialize(string ip, int port, int slaveAddress,
+            int startAddress, int numberOfInputs)
         {
             Console.CursorVisible = false;
             //Console.SetBufferSize(Console.WindowWidth, Console.WindowHeight);
@@ -53,26 +68,26 @@ namespace ModbusStatus.UI
             {
                 var stateEvent = displayEvents[i];
                 Console.SetCursorPosition(12, 5 + i);
-                Console.Write($"{stateEvent.Date.ToString("yyyy-dd-MM HH.mm.ss")} {stateEvent.Message}");
+                Console.Write($"{stateEvent.Date.ToString(LOG_DATE_FORMAT)} {stateEvent.Message}");
             }
         }
 
         public void SetOffline()
         {
             ClearConnectionStatus();
-            PrintConnectionStatus("OFFLINE", ConsoleColor.Gray, ConsoleColor.DarkGray);
+            PrintConnectionStatus(OFFLINE_TEXT, OFFLINE_COLOR, OFFLINE_BACKGROUND_COLOR);
         }
 
         public void SetOnline()
         {
             ClearConnectionStatus();
-            PrintConnectionStatus("ONLINE", ConsoleColor.Green, ConsoleColor.DarkGreen);
+            PrintConnectionStatus(ONLINE_TEXT, ONLINE_COLOR, ONLINE_BACKGROUND_COLOR);
         }
 
         public void SetState(bool[] state)
         {
-            Console.BackgroundColor = ConsoleColor.DarkMagenta;
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.BackgroundColor = STATE_COLOR;
+            Console.ForegroundColor = STATE_BACKGROUND_COLOR;
 
             for (var i = 0; i < state.Length; i++)
             {
@@ -120,7 +135,8 @@ namespace ModbusStatus.UI
             Console.Write("STATUS:");
         }
 
-        private void PrintConnectionText(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs)
+        private void PrintConnectionText(string ip, int port, int slaveAddress,
+            int startAddress, int numberOfInputs)
         {
             Console.ResetColor();
 
@@ -141,16 +157,18 @@ namespace ModbusStatus.UI
 
         private void ClearLog()
         {
-            _consoleExtensions.ClearBox(12, 5, Console.WindowWidth - 13, Console.WindowHeight - 7);
+            _consoleExtensions.ClearBox(12, 5, Console.WindowWidth - 13,
+                Console.WindowHeight - 7);
         }
 
         private void ClearConnectionStatus()
         {
-            // TODO: const for online\offline and max
-            _consoleExtensions.ClearBox(8, 3, "OFFLINE".Length, 1);
+            var clearLength = Math.Max(ONLINE_TEXT.Length, OFFLINE_TEXT.Length);
+            _consoleExtensions.ClearBox(8, 3, clearLength, 1);
         }
 
-        private void PrintConnectionStatus(string status, ConsoleColor backgroundColor, ConsoleColor foregroundColor)
+        private void PrintConnectionStatus(string status,
+            ConsoleColor backgroundColor, ConsoleColor foregroundColor)
         {
             Console.SetCursorPosition(8, 3);
             Console.BackgroundColor = backgroundColor;

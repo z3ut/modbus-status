@@ -76,6 +76,7 @@ namespace ModbusStatus.StateMonitoring
         void SetOffline()
         {
             _stateDisplay.AddLog(new GoneOffline(DateTime.Now));
+            _stateDisplay.SetOffline();
         }
     }
 }
