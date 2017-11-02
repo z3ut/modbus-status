@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModbusStatus.UI
+namespace ModbusStatus.UI.Shared
 {
     public class CursorPosition
     {

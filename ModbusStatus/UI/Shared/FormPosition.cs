@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModbusStatus.UI
+namespace ModbusStatus.UI.Shared
 {
-    public class WindowPosition
+    public class FormPosition
     {
         public int BorderLeft { get; set; }
         public int BorderTop { get; set; }
@@ -16,12 +16,12 @@ namespace ModbusStatus.UI
         public int ContentWidth { get; set; }
         public int ContentHeight { get; set; }
 
-        public WindowPosition()
+        public FormPosition()
         {
 
         }
 
-        public WindowPosition(int borderLeft, int borderTop, int totalWidth,
+        public FormPosition(int borderLeft, int borderTop, int totalWidth,
             int totalHeight, int borderWidth)
         {
             BorderLeft = borderLeft;
@@ -35,7 +35,7 @@ namespace ModbusStatus.UI
             ContentHeight = TotalHeight - 2 * borderWidth;
         }
 
-        public WindowPosition(int borderLeft, int borderTop, int totalWidth, int totalHeight,
+        public FormPosition(int borderLeft, int borderTop, int totalWidth, int totalHeight,
             int contentLeft, int contentTop, int contentWidth, int contentHeight)
         {
             BorderLeft = borderLeft;
