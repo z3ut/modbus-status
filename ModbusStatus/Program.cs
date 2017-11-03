@@ -6,6 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
+using ModbusStatus.UI.Components;
+using ModbusStatus.UI.Shared.WindowBorders;
+using ModbusStatus.UI.Shared;
+using ModbusStatus.StateMonitoring.DeviceStateReader;
 
 namespace ModbusStatus
 {
@@ -22,7 +27,9 @@ namespace ModbusStatus
         {
             ValidateAndParseUserInput(args);
 
-            var stateMonitor = new StateMonitor();
+            var builder = BuildServiceProvider();
+            var stateMonitor = builder.GetService<IStateMonitor>();
+
             stateMonitor.Init(deviceIp, devicePort, slaveAddress, startAddress, numberOfInputs);
             stateMonitor.Start(updatePeriod);
         }
@@ -99,6 +106,27 @@ namespace ModbusStatus
             Console.WriteLine("Use format: modbus-status IP [PORT] [SLAVE ADDRESS] [START ADDRESS] [NUMBER OF INPUTS]");
             Console.WriteLine("Example:");
             Console.WriteLine("modbus-status 12.34.56.78 22 0 16");
+        }
+
+        static IServiceProvider BuildServiceProvider()
+        {
+            IServiceCollection services = new ServiceCollection();
+
+            services.AddTransient<ICurrentState, CurrentState>();
+            services.AddTransient<IStateMonitor, StateMonitor>();
+            services.AddTransient<IDeviceStateReader, DeviceStateReaderMoq>();
+
+            services.AddTransient<IStateDisplay, StateDisplay>();
+
+            services.AddTransient<ILogComponent, LogComponent>();
+            services.AddTransient<IStateComponent, StateComponent>();
+            services.AddTransient<IStatusComponent, StatusComponent>();
+
+            services.AddTransient<IWindowBorders, WindowBorderFancy>();
+
+            services.AddTransient<IConsoleExtensions, ConsoleExtensions>();
+
+            return services.BuildServiceProvider();
         }
     }
 }

@@ -18,12 +18,6 @@ namespace ModbusStatus.StateMonitoring
         private IStateDisplay _stateDisplay;
         private ICurrentState _currentState;
 
-        public StateMonitor()
-        {
-            _stateDisplay =  new StateDisplay(new ConsoleExtensions(), new WindowBorderFancy());
-            _currentState = new CurrentState(new DeviceStateReaderMoq());
-        }
-
         public StateMonitor(IStateDisplay stateDisplay, ICurrentState currentState)
         {
             _stateDisplay = stateDisplay;

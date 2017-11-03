@@ -22,14 +22,16 @@ namespace ModbusStatus.UI
         private IStateComponent _stateComponent;
         private IStatusComponent _statusComponent;
 
-        public StateDisplay(IConsoleExtensions consoleExtensions, IWindowBorders windowBorders)
+        public StateDisplay(IConsoleExtensions consoleExtensions,
+            IWindowBorders windowBorders, ILogComponent logComponent,
+            IStateComponent stateComponent, IStatusComponent statusComponent)
         {
             _consoleExtensions = consoleExtensions;
             _windowBorder = windowBorders;
 
-            _logComponent = new LogComponent(consoleExtensions);
-            _stateComponent = new StateComponent(consoleExtensions);
-            _statusComponent = new StatusComponent(consoleExtensions);
+            _logComponent = logComponent;
+            _stateComponent = stateComponent;
+            _statusComponent = statusComponent;
         }
 
         public void Initialize(string ip, int port, int slaveAddress,
