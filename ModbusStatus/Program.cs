@@ -1,11 +1,6 @@
 ﻿using ModbusStatus.StateMonitoring;
-using ModbusStatus.StateEvents;
 using ModbusStatus.UI;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
-using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using ModbusStatus.UI.Components;
 using ModbusStatus.UI.Shared.WindowBorders;
@@ -17,23 +12,22 @@ namespace ModbusStatus
 {
     class Program
     {
-        static int Main(string[] args)
+        static void Main(string[] args)
         {
-            return Parser.Default.ParseArguments<Options>(args)
-                .MapResult(options => RunAndReturnExitCode(options),
-                _ => 1);
+            Parser.Default.ParseArguments<Options>(args)
+                .WithParsed(options => RunAndReturnExitCode(options));
         }
 
-        static int RunAndReturnExitCode(Options options)
+        static void RunAndReturnExitCode(Options options)
         {
+            Console.CancelKeyPress += (sender, e) => Console.Clear();
+
             var builder = BuildServiceProvider();
             var stateMonitor = builder.GetService<IStateMonitor>();
 
             stateMonitor.Init(options.Ip, options.Port, options.SlaveAddress,
                 options.StartAddress, options.NumberOfInputs);
             stateMonitor.StartSync(options.UpdatePeriod);
-
-            return 0;
         }
 
         static IServiceProvider BuildServiceProvider()
