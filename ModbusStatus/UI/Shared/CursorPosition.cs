@@ -9,11 +9,6 @@ namespace ModbusStatus.UI.Shared
         public int Left { get; set; }
         public int Top { get; set; }
 
-        public CursorPosition()
-        {
-
-        }
-
         public CursorPosition(int left, int top)
         {
             Left = left;

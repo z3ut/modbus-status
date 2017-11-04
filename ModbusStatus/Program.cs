@@ -25,7 +25,7 @@ namespace ModbusStatus
             var builder = BuildServiceProvider();
             var stateMonitor = builder.GetService<IStateMonitor>();
 
-            stateMonitor.Init(options.Ip, options.Port, options.SlaveAddress,
+            stateMonitor.Initialize(options.Ip, options.Port, options.SlaveAddress,
                 options.StartAddress, options.NumberOfInputs);
             stateMonitor.StartSync(options.UpdatePeriod);
         }

@@ -32,7 +32,7 @@ namespace ModbusStatus.StateMonitoring
             _deviceStateReader = deviceStateReader;
         }
 
-        public void Init(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs)
+        public void Initialize(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs)
         {
             _ip = ip;
             _port = port;

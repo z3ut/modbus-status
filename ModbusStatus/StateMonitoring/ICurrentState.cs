@@ -7,7 +7,7 @@ namespace ModbusStatus.StateMonitoring
 {
     public interface ICurrentState
     {
-        void Init(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs);
+        void Initialize(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs);
         void Update();
 
         event NewState OnNewState;

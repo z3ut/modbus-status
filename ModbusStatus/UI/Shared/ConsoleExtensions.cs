@@ -62,12 +62,12 @@ namespace ModbusStatus.UI.Shared
             char? topLeftSymbol = null, char? topRightSymbol = null,
             char? bottomLeftSymbol = null, char? bottomRightSymbol = null)
         {
-            var horizontalSymbolValue = horizontalSymbol ?? windowBorders.HorizontalSymbol;
-            var verticalSymbolValue = verticalSymbol ?? windowBorders.VerticalSymbol;
-            var topLeftSymbolValue = topLeftSymbol ?? windowBorders.TopLeftSymbol;
-            var topRightValue = topRightSymbol ?? windowBorders.TopRightSymbol;
-            var bottomLeftValue = bottomLeftSymbol ?? windowBorders.BottomLeftSymbol;
-            var bottomRightValue = bottomRightSymbol ?? windowBorders.BottomRightSymbol;
+            char horizontalSymbolValue = horizontalSymbol ?? windowBorders.HorizontalSymbol;
+            char verticalSymbolValue = verticalSymbol ?? windowBorders.VerticalSymbol;
+            char topLeftSymbolValue = topLeftSymbol ?? windowBorders.TopLeftSymbol;
+            char topRightValue = topRightSymbol ?? windowBorders.TopRightSymbol;
+            char bottomLeftValue = bottomLeftSymbol ?? windowBorders.BottomLeftSymbol;
+            char bottomRightValue = bottomRightSymbol ?? windowBorders.BottomRightSymbol;
 
             DrawForm(left, top, width, height, horizontalSymbolValue, verticalSymbolValue,
                 topLeftSymbolValue, topRightValue, bottomLeftValue, bottomRightValue);

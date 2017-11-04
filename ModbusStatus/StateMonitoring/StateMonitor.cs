@@ -24,9 +24,9 @@ namespace ModbusStatus.StateMonitoring
             _currentState = currentState;
         }
 
-        public void Init(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs)
+        public void Initialize(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs)
         {
-            _currentState.Init(ip, port, slaveAddress, startAddress, numberOfInputs);
+            _currentState.Initialize(ip, port, slaveAddress, startAddress, numberOfInputs);
             _stateDisplay.Initialize(ip, port, slaveAddress, startAddress, numberOfInputs);
 
             _currentState.OnNewState += _currentState_OnNewState;

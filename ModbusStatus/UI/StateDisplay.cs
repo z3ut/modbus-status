@@ -49,8 +49,8 @@ namespace ModbusStatus.UI
             _statusComponent.Initialize(_statusTextForm, ip, port, slaveAddress, startAddress, numberOfInputs);
             
             Console.CursorVisible = false;
-            //Console.SetBufferSize(Console.WindowWidth, Console.WindowHeight);
-            
+            Console.SetBufferSize(Console.WindowWidth, Console.WindowHeight);
+
             PrintUiBorders();
         }
 

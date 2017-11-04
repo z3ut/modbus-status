@@ -16,11 +16,6 @@ namespace ModbusStatus.UI.Shared
         public int ContentWidth { get; set; }
         public int ContentHeight { get; set; }
 
-        public FormPosition()
-        {
-
-        }
-
         public FormPosition(int borderLeft, int borderTop, int totalWidth,
             int totalHeight, int borderWidth)
         {
