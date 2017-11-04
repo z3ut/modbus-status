@@ -36,7 +36,11 @@ namespace ModbusStatus
 
             services.AddTransient<ICurrentState, CurrentState>();
             services.AddTransient<IStateMonitor, StateMonitor>();
+#if DEBUG
             services.AddTransient<IDeviceStateReader, DeviceStateReaderMoq>();
+#else
+            services.AddTransient<IDeviceStateReader, DeviceStateReader>();
+#endif
 
             services.AddTransient<IStateDisplay, StateDisplay>();
 
