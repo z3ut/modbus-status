@@ -11,101 +11,29 @@ using ModbusStatus.UI.Components;
 using ModbusStatus.UI.Shared.WindowBorders;
 using ModbusStatus.UI.Shared;
 using ModbusStatus.StateMonitoring.DeviceStateReader;
+using CommandLine;
 
 namespace ModbusStatus
 {
     class Program
     {
-        static int updatePeriod = 500;
-        static string deviceIp;
-        static int devicePort = 502;
-        static int slaveAddress = 0;
-        static int startAddress = 0;
-        static int numberOfInputs = 16;
-
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            ValidateAndParseUserInput(args);
+            return Parser.Default.ParseArguments<Options>(args)
+                .MapResult(options => RunAndReturnExitCode(options),
+                _ => 1);
+        }
 
+        static int RunAndReturnExitCode(Options options)
+        {
             var builder = BuildServiceProvider();
             var stateMonitor = builder.GetService<IStateMonitor>();
 
-            stateMonitor.Init(deviceIp, devicePort, slaveAddress, startAddress, numberOfInputs);
-            stateMonitor.Start(updatePeriod);
-        }
+            stateMonitor.Init(options.Ip, options.Port, options.SlaveAddress,
+                options.StartAddress, options.NumberOfInputs);
+            stateMonitor.StartSync(options.UpdatePeriod);
 
-        static void ValidateAndParseUserInput(string[] args)
-        {
-            if (args.Length < 1)
-            {
-                PrintUsageFormat();
-                Environment.Exit(0);
-            }
-
-            deviceIp = args[0];
-
-            if (args.Length >= 2)
-            {
-                try
-                {
-                    devicePort = int.Parse(args[1]);
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("Port must be integer number");
-                    PrintUsageFormat();
-                    Environment.Exit(0);
-                }
-            }
-
-            if (args.Length >= 3)
-            {
-                try
-                {
-                    slaveAddress = int.Parse(args[2]);
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("Slave address must be integer number");
-                    PrintUsageFormat();
-                    Environment.Exit(0);
-                }
-            }
-
-            if (args.Length >= 4)
-            {
-                try
-                {
-                    startAddress = int.Parse(args[3]);
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("Start address must be integer number");
-                    PrintUsageFormat();
-                    Environment.Exit(0);
-                }
-            }
-
-            if (args.Length >= 5)
-            {
-                try
-                {
-                    numberOfInputs = int.Parse(args[4]);
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("Number of inputs must be integer number");
-                    PrintUsageFormat();
-                    Environment.Exit(0);
-                }
-            }
-        }
-
-        static void PrintUsageFormat()
-        {
-            Console.WriteLine("Use format: modbus-status IP [PORT] [SLAVE ADDRESS] [START ADDRESS] [NUMBER OF INPUTS]");
-            Console.WriteLine("Example:");
-            Console.WriteLine("modbus-status 12.34.56.78 22 0 16");
+            return 0;
         }
 
         static IServiceProvider BuildServiceProvider()

@@ -37,7 +37,7 @@ namespace ModbusStatus.StateMonitoring
             _isInited = true;
         }
 
-        public void Start(int updatePeriod)
+        public void StartSync(int updatePeriod)
         {
             if (!_isInited)
             {
