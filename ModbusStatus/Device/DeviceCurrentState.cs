@@ -1,12 +1,12 @@
-﻿using ModbusStatus.StateMonitoring.DeviceStateReader;
+﻿using ModbusStatus.Device.DeviceStateReader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ModbusStatus.StateMonitoring
+namespace ModbusStatus.Device
 {
-    class CurrentState : ICurrentState
+    class DeviceCurrentState : IDeviceCurrentState
     {
         public event NewState OnNewState;
         public event Action OnGoneOnline;
@@ -27,7 +27,7 @@ namespace ModbusStatus.StateMonitoring
         private bool _isFirstUpdate = true;
         private bool _isOnline = false;
 
-        public CurrentState(IDeviceStateReader deviceStateReader)
+        public DeviceCurrentState(IDeviceStateReader deviceStateReader)
         {
             _deviceStateReader = deviceStateReader;
         }

@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModbusStatus.StateMonitoring
+namespace ModbusStatus.Device
 {
-    public interface ICurrentState
+    public interface IDeviceCurrentState
     {
         void Initialize(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs);
         void Update();

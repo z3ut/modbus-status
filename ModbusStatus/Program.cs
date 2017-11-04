@@ -1,12 +1,12 @@
-﻿using ModbusStatus.StateMonitoring;
-using ModbusStatus.UI;
-using System;
+﻿using CommandLine;
 using Microsoft.Extensions.DependencyInjection;
+using ModbusStatus.Device;
+using ModbusStatus.Device.DeviceStateReader;
+using ModbusStatus.UI;
 using ModbusStatus.UI.Components;
 using ModbusStatus.UI.Shared.WindowBorders;
 using ModbusStatus.UI.Shared;
-using ModbusStatus.StateMonitoring.DeviceStateReader;
-using CommandLine;
+using System;
 
 namespace ModbusStatus
 {
@@ -34,14 +34,13 @@ namespace ModbusStatus
         {
             IServiceCollection services = new ServiceCollection();
 
-            services.AddTransient<ICurrentState, CurrentState>();
+            services.AddTransient<IDeviceCurrentState, DeviceCurrentState>();
             services.AddTransient<IStateMonitor, StateMonitor>();
 #if DEBUG
             services.AddTransient<IDeviceStateReader, DeviceStateReaderMoq>();
 #else
             services.AddTransient<IDeviceStateReader, DeviceStateReader>();
 #endif
-
             services.AddTransient<IStateDisplay, StateDisplay>();
 
             services.AddTransient<ILogComponent, LogComponent>();
@@ -49,7 +48,6 @@ namespace ModbusStatus
             services.AddTransient<IStatusComponent, StatusComponent>();
 
             services.AddTransient<IWindowBorders, WindowBorderFancy>();
-
             services.AddTransient<IConsoleExtensions, ConsoleExtensions>();
 
             return services.BuildServiceProvider();

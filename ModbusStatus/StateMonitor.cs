@@ -1,4 +1,5 @@
-﻿using ModbusStatus.StateMonitoring.DeviceStateReader;
+﻿using ModbusStatus.Device;
+using ModbusStatus.Device.DeviceStateReader;
 using ModbusStatus.StateEvents;
 using ModbusStatus.UI;
 using ModbusStatus.UI.Shared;
@@ -9,30 +10,30 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace ModbusStatus.StateMonitoring
+namespace ModbusStatus
 {
     public class StateMonitor : IStateMonitor
     {
         private bool _isInited = false;
 
         private IStateDisplay _stateDisplay;
-        private ICurrentState _currentState;
+        private IDeviceCurrentState _deviceCurrentState;
 
-        public StateMonitor(IStateDisplay stateDisplay, ICurrentState currentState)
+        public StateMonitor(IStateDisplay stateDisplay, IDeviceCurrentState currentState)
         {
             _stateDisplay = stateDisplay;
-            _currentState = currentState;
+            _deviceCurrentState = currentState;
         }
 
         public void Initialize(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs)
         {
-            _currentState.Initialize(ip, port, slaveAddress, startAddress, numberOfInputs);
+            _deviceCurrentState.Initialize(ip, port, slaveAddress, startAddress, numberOfInputs);
             _stateDisplay.Initialize(ip, port, slaveAddress, startAddress, numberOfInputs);
 
-            _currentState.OnNewState += _currentState_OnNewState;
-            _currentState.OnStateChanges += _currentState_OnStateChanges;
-            _currentState.OnGoneOnline += SetOnline;
-            _currentState.OnGoneOffline += SetOffline;
+            _deviceCurrentState.OnNewState += _currentState_OnNewState;
+            _deviceCurrentState.OnStateChanges += _currentState_OnStateChanges;
+            _deviceCurrentState.OnGoneOnline += SetOnline;
+            _deviceCurrentState.OnGoneOffline += SetOffline;
 
             _isInited = true;
         }
@@ -46,7 +47,7 @@ namespace ModbusStatus.StateMonitoring
 
             for (; ; )
             {
-                _currentState.Update();
+                _deviceCurrentState.Update();
                 Thread.Sleep(updatePeriod);
             }
         }

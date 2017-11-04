@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ModbusStatus.StateMonitoring.DeviceStateReader
+namespace ModbusStatus.Device.DeviceStateReader
 {
     public class DeviceStateReaderMoq : IDeviceStateReader
     {
