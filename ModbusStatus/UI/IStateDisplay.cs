@@ -7,12 +7,13 @@ namespace ModbusStatus.UI
 {
     public interface IStateDisplay
     {
-        void Initialize(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs);
+        void Initialize(string ip, int port, int slaveAddress,
+            int startAddress, int numberOfInputs);
         
         void AddLog(IStateEvent stateEvent);
         void AddLog(IEnumerable<IStateEvent> stateEvents);
 
-        void SetState(bool[] state);
+        void SetValues(bool[] state);
         void SetOnline();
         void SetOffline();
     }

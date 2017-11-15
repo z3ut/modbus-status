@@ -9,6 +9,8 @@ namespace ModbusStatus.UI.Shared
     {
         void ClearBox(int left, int top, int width, int height);
 
+        void SetCursorPosition(CursorPosition cursorPosition);
+
         void DrawForm(int left, int top, int width, int height,
             char horizontalSymbol = '-', char verticalSymbol = '|',
             char topLeftSymbol = '#', char topRightSymbol = '#',

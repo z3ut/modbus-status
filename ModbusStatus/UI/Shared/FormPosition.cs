@@ -16,8 +16,8 @@ namespace ModbusStatus.UI.Shared
         public int ContentWidth { get; set; }
         public int ContentHeight { get; set; }
 
-        public FormPosition(int borderLeft, int borderTop, int totalWidth,
-            int totalHeight, int borderWidth)
+        public FormPosition(int borderLeft, int borderTop,
+            int totalWidth, int totalHeight, int borderWidth)
         {
             BorderLeft = borderLeft;
             BorderTop = borderTop;
@@ -30,8 +30,10 @@ namespace ModbusStatus.UI.Shared
             ContentHeight = TotalHeight - 2 * borderWidth;
         }
 
-        public FormPosition(int borderLeft, int borderTop, int totalWidth, int totalHeight,
-            int contentLeft, int contentTop, int contentWidth, int contentHeight)
+        public FormPosition(int borderLeft, int borderTop,
+            int totalWidth, int totalHeight,
+            int contentLeft, int contentTop,
+            int contentWidth, int contentHeight)
         {
             BorderLeft = borderLeft;
             BorderTop = borderTop;

@@ -11,48 +11,52 @@ namespace ModbusStatus.UI
 {
     public class StateDisplay : IStateDisplay
     {
-        private IConsoleExtensions _consoleExtensions;
-        private IWindowBorders _windowBorder;
+        private const int STATUS_HEIGHT = 5;
+        private const int VALUES_WIDTH = 12;
+        private const int BORDER_WIDTH = 1;
 
-        private FormPosition _statusTextForm;
-        private FormPosition _stateTextForm;
-        private FormPosition _logTextForm;
+        private readonly IConsoleExtensions _consoleExtensions;
+        private readonly IWindowBorders _windowBorder;
 
-        private ILogComponent _logComponent;
-        private IStateComponent _stateComponent;
-        private IStatusComponent _statusComponent;
+        private readonly ILogComponent _logComponent;
+        private readonly IValuesComponent _valuesComponent;
+        private readonly IStatusComponent _statusComponent;
+
+        private FormPosition _statusFormPosition;
+        private FormPosition _valuesFormPosition;
+        private FormPosition _logFormPosition;
+
+        private string _ip;
+        private int _port;
+        private int _slaveAddress;
+        private int _startAddress;
+        private int _numberOfInputs;
 
         public StateDisplay(IConsoleExtensions consoleExtensions,
             IWindowBorders windowBorders, ILogComponent logComponent,
-            IStateComponent stateComponent, IStatusComponent statusComponent)
+            IValuesComponent valuesComponent, IStatusComponent statusComponent)
         {
             _consoleExtensions = consoleExtensions;
             _windowBorder = windowBorders;
 
             _logComponent = logComponent;
-            _stateComponent = stateComponent;
+            _valuesComponent = valuesComponent;
             _statusComponent = statusComponent;
         }
 
         public void Initialize(string ip, int port, int slaveAddress,
             int startAddress, int numberOfInputs)
         {
-            Console.Clear();
+            _ip = ip;
+            _port = port;
+            _slaveAddress = slaveAddress;
+            _startAddress = startAddress;
+            _numberOfInputs = numberOfInputs;
 
-            _statusTextForm = new FormPosition(0, 0, Console.WindowWidth, 5, 1);
-            _stateTextForm = new FormPosition(0, 4, 12, Console.WindowHeight - 5, 1);
-            _logTextForm = new FormPosition(11, 4, Console.WindowWidth - 11,
-                Console.WindowHeight - 5, 1);
-
-            _logComponent.Initialize(_logTextForm);
-            _stateComponent.Initialize(_stateTextForm);
-            _statusComponent.Initialize(_statusTextForm, ip, port, slaveAddress, startAddress, numberOfInputs);
-            
-            Console.CursorVisible = false;
-            Console.Title = $"ModbusStatus {ip}";
-            Console.SetBufferSize(Console.WindowWidth, Console.WindowHeight);
-
+            InitializeConsoleSettings();
+            InitializeFormPositions();
             PrintUiBorders();
+            InitializeComponents();
         }
 
         public void AddLog(IStateEvent stateEvent)
@@ -75,29 +79,61 @@ namespace ModbusStatus.UI
             _statusComponent.SetOnline();
         }
 
-        public void SetState(bool[] state)
+        public void SetValues(bool[] values)
         {
-            _stateComponent.SetState(state);
+            _valuesComponent.SetValues(values);
+        }
+
+        private void InitializeConsoleSettings()
+        {
+            Console.Clear();
+            Console.CursorVisible = false;
+            Console.Title = $"ModbusStatus {_ip}";
+            Console.SetBufferSize(Console.WindowWidth, Console.WindowHeight);
+        }
+
+        private void InitializeFormPositions()
+        {
+            int secondRowTopPosition = STATUS_HEIGHT - 1;
+            int logLeftPosition = VALUES_WIDTH - 1;
+
+            _statusFormPosition = new FormPosition(0, 0, Console.WindowWidth,
+                STATUS_HEIGHT, BORDER_WIDTH);
+            _valuesFormPosition = new FormPosition(0, secondRowTopPosition,
+                VALUES_WIDTH, Console.WindowHeight - STATUS_HEIGHT, BORDER_WIDTH);
+            _logFormPosition = new FormPosition(logLeftPosition,
+                secondRowTopPosition, Console.WindowWidth - logLeftPosition,
+                Console.WindowHeight - STATUS_HEIGHT, BORDER_WIDTH);
         }
 
         private void PrintUiBorders()
         {
             Console.ResetColor();
 
-            _consoleExtensions.DrawForm(_statusTextForm.BorderLeft, _statusTextForm.BorderTop,
-                _statusTextForm.TotalWidth, _statusTextForm.TotalHeight, _windowBorder);
+            _consoleExtensions.DrawForm(_statusFormPosition.BorderLeft,
+                _statusFormPosition.BorderTop, _statusFormPosition.TotalWidth,
+                _statusFormPosition.TotalHeight, _windowBorder);
 
-            _consoleExtensions.DrawForm(_stateTextForm.BorderLeft, _stateTextForm.BorderTop,
-                _stateTextForm.TotalWidth, _stateTextForm.TotalHeight, _windowBorder,
+            _consoleExtensions.DrawForm(_valuesFormPosition.BorderLeft,
+                _valuesFormPosition.BorderTop, _valuesFormPosition.TotalWidth,
+                _valuesFormPosition.TotalHeight, _windowBorder,
                 topLeftSymbol: _windowBorder.VerticalAndRightSymbol);
 
-            _consoleExtensions.DrawForm(_logTextForm.BorderLeft,
-                _logTextForm.BorderTop, _logTextForm.TotalWidth,
-                _logTextForm.TotalHeight, _windowBorder,
+            _consoleExtensions.DrawForm(_logFormPosition.BorderLeft,
+                _logFormPosition.BorderTop, _logFormPosition.TotalWidth,
+                _logFormPosition.TotalHeight, _windowBorder,
                 _windowBorder.HorizontalSymbol, _windowBorder.VerticalSymbol,
                 topLeftSymbol: _windowBorder.HorizontalAndBottomSymbol,
                 topRightSymbol: _windowBorder.VerticalAndLeftSymbol,
                 bottomLeftSymbol: _windowBorder.HorizontalAndTopSymbol);
+        }
+
+        private void InitializeComponents()
+        {
+            _logComponent.Initialize(_logFormPosition);
+            _valuesComponent.Initialize(_valuesFormPosition);
+            _statusComponent.Initialize(_statusFormPosition, _ip, _port,
+                _slaveAddress, _startAddress, _numberOfInputs);
         }
     }
 }

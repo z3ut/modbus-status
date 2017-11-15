@@ -9,7 +9,7 @@ namespace ModbusStatus.UI.Components
 {
     public class LogComponent : ILogComponent
     {
-        private IConsoleExtensions _consoleExtensions;
+        private readonly IConsoleExtensions _consoleExtensions;
 
         private const int MAX_EVENT_COUNT = 100;
         private List<IStateEvent> _stateEvents = new List<IStateEvent>();

@@ -20,6 +20,11 @@ namespace ModbusStatus.UI.Shared
             }
         }
 
+        public void SetCursorPosition(CursorPosition cursorPosition)
+        {
+            Console.SetCursorPosition(cursorPosition.Left, cursorPosition.Top);
+        }
+
         public void DrawForm(int left, int top, int width, int height,
             char horizontalSymbol = '-', char verticalSymbol = '|',
             char topLeftSymbol = '#', char topRightSymbol = '#',

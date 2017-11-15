@@ -19,16 +19,20 @@ namespace ModbusStatus
         private IStateDisplay _stateDisplay;
         private IDeviceCurrentState _deviceCurrentState;
 
-        public StateMonitor(IStateDisplay stateDisplay, IDeviceCurrentState currentState)
+        public StateMonitor(IStateDisplay stateDisplay,
+            IDeviceCurrentState currentState)
         {
             _stateDisplay = stateDisplay;
             _deviceCurrentState = currentState;
         }
 
-        public void Initialize(string ip, int port, int slaveAddress, int startAddress, int numberOfInputs)
+        public void Initialize(string ip, int port, int slaveAddress,
+            int startAddress, int numberOfInputs)
         {
-            _deviceCurrentState.Initialize(ip, port, slaveAddress, startAddress, numberOfInputs);
-            _stateDisplay.Initialize(ip, port, slaveAddress, startAddress, numberOfInputs);
+            _deviceCurrentState.Initialize(ip, port, slaveAddress,
+                startAddress, numberOfInputs);
+            _stateDisplay.Initialize(ip, port, slaveAddress,
+                startAddress, numberOfInputs);
 
             _deviceCurrentState.OnNewState += _currentState_OnNewState;
             _deviceCurrentState.OnStateChanges += _currentState_OnStateChanges;
@@ -42,7 +46,7 @@ namespace ModbusStatus
         {
             if (!_isInited)
             {
-                throw new Exception("StateMonitor must be inited before update");
+                throw new Exception("StateMonitor must be inited before monitoring start");
             }
 
             for (; ; )
@@ -54,12 +58,14 @@ namespace ModbusStatus
 
         private void _currentState_OnStateChanges(IDictionary<int, bool> changes)
         {
-            _stateDisplay.AddLog(changes.Select(c => new InputChange(c.Key, c.Value, DateTime.Now)));
+            var inputChangeEvents = changes
+                .Select(c => new InputChange(c.Key, c.Value, DateTime.Now));
+            _stateDisplay.AddLog(inputChangeEvents);
         }
 
         private void _currentState_OnNewState(bool[] values)
         {
-            _stateDisplay.SetState(values);
+            _stateDisplay.SetValues(values);
         }
 
         void SetOnline()

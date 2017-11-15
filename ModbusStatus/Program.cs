@@ -44,7 +44,7 @@ namespace ModbusStatus
             services.AddTransient<IStateDisplay, StateDisplay>();
 
             services.AddTransient<ILogComponent, LogComponent>();
-            services.AddTransient<IStateComponent, StateComponent>();
+            services.AddTransient<IValuesComponent, ValuesComponent>();
             services.AddTransient<IStatusComponent, StatusComponent>();
 
             services.AddTransient<IWindowBorders, WindowBorderFancy>();

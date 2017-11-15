@@ -5,9 +5,9 @@ using System.Text;
 
 namespace ModbusStatus.UI.Components
 {
-    public interface IStateComponent
+    public interface IValuesComponent
     {
         void Initialize(FormPosition formPosition);
-        void SetState(bool[] state);
+        void SetValues(bool[] values);
     }
 }
