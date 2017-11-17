@@ -11,19 +11,18 @@ namespace ModbusStatus.UI.Components
 
         private FormPosition _statusTextForm;
 
+        private const int STATUS_COLUMN_WIDTH = 20;
         private const string ONLINE_TEXT = "ONLINE";
         private const string OFFLINE_TEXT = "OFFLINE";
 
         private int CONNECTION_STATUS_MAX_LENGTH =
             Math.Max(ONLINE_TEXT.Length, OFFLINE_TEXT.Length);
 
-        private const ConsoleColor ONLINE_COLOR = ConsoleColor.Green;
-        private const ConsoleColor ONLINE_BACKGROUND_COLOR = ConsoleColor.DarkGreen;
+        private readonly ConsoleColor _onlineColor;
+        private readonly ConsoleColor _onlineBackgroundColor;
 
-        private const ConsoleColor OFFLINE_COLOR = ConsoleColor.Gray;
-        private const ConsoleColor OFFLINE_BACKGROUND_COLOR = ConsoleColor.DarkGray;
-
-        private const int STATUS_COLUMN_WIDTH = 20;
+        private readonly ConsoleColor _offlineColor;
+        private readonly ConsoleColor _offlineBackgroundColor;
 
         private CursorPosition _textIpPosition;
         private CursorPosition _textPortPosition;
@@ -32,9 +31,16 @@ namespace ModbusStatus.UI.Components
         private CursorPosition _textNumberOfInputsPosition;
         private CursorPosition _textConnectionStatusPosition;
 
-        public StatusComponent(IConsoleExtensions consoleExtensions)
+        public StatusComponent(IConsoleExtensions consoleExtensions,
+            ConsoleColor onlineColor,ConsoleColor onlineBackgroundColor,
+            ConsoleColor offlineColor,
+            ConsoleColor offlineBackgroundColor)
         {
             _consoleExtensions = consoleExtensions;
+            _onlineColor = onlineColor;
+            _onlineBackgroundColor = onlineBackgroundColor;
+            _offlineColor = offlineColor;
+            _offlineBackgroundColor = offlineBackgroundColor;
         }
 
         public void Initialize(FormPosition formPosition, string ip, int port,
@@ -59,18 +65,17 @@ namespace ModbusStatus.UI.Components
             // third row
             _textConnectionStatusPosition = new CursorPosition(_statusTextForm.ContentLeft, _statusTextForm.ContentTop + 2);
 
-            //PrintUiText();
             PrintStatusText(ip, port, slaveAddress, startAddress, numberOfInputs);
         }
 
         public void SetOffline()
         {
-            PrintConnectionStatus(OFFLINE_TEXT, OFFLINE_COLOR, OFFLINE_BACKGROUND_COLOR);
+            PrintConnectionStatus(OFFLINE_TEXT, _offlineColor, _offlineBackgroundColor);
         }
 
         public void SetOnline()
         {
-            PrintConnectionStatus(ONLINE_TEXT, ONLINE_COLOR, ONLINE_BACKGROUND_COLOR);
+            PrintConnectionStatus(ONLINE_TEXT, _onlineColor, _onlineBackgroundColor);
         }
 
         private void PrintConnectionStatus(string status,

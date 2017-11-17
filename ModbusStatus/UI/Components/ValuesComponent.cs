@@ -9,14 +9,17 @@ namespace ModbusStatus.UI.Components
     {
         private readonly IConsoleExtensions _consoleExtensions;
 
-        private const ConsoleColor STATE_COLOR = ConsoleColor.DarkMagenta;
-        private const ConsoleColor STATE_BACKGROUND_COLOR = ConsoleColor.DarkYellow;
+        private readonly ConsoleColor _valueColor;
+        private readonly ConsoleColor _valueBackgroundColor;
 
         private FormPosition _stateTextForm;
 
-        public ValuesComponent(IConsoleExtensions consoleExtensions)
+        public ValuesComponent(IConsoleExtensions consoleExtensions,
+            ConsoleColor valueColor, ConsoleColor valueBackgroundColor)
         {
             _consoleExtensions = consoleExtensions;
+            _valueColor = valueColor;
+            _valueBackgroundColor = valueBackgroundColor;
         }
 
         public void Initialize(FormPosition formPosition)
@@ -26,8 +29,8 @@ namespace ModbusStatus.UI.Components
 
         public void SetValues(bool[] state)
         {
-            Console.BackgroundColor = STATE_COLOR;
-            Console.ForegroundColor = STATE_BACKGROUND_COLOR;
+            Console.BackgroundColor = _valueColor;
+            Console.ForegroundColor = _valueBackgroundColor;
 
             for (var i = 0; i < state.Length; i++)
             {

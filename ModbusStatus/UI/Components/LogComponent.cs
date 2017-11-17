@@ -11,16 +11,19 @@ namespace ModbusStatus.UI.Components
     {
         private readonly IConsoleExtensions _consoleExtensions;
 
-        private const int MAX_EVENT_COUNT = 100;
+        private readonly int _storeMaxEventCount;
         private List<IStateEvent> _stateEvents = new List<IStateEvent>();
 
-        private const string LOG_DATE_FORMAT = "yyyy-dd-MM HH.mm.ss";
+        private readonly string _dateFormat;
 
         private FormPosition _logTextForm;
 
-        public LogComponent(IConsoleExtensions consoleExtensions)
+        public LogComponent(IConsoleExtensions consoleExtensions,
+            int storeMaxEventCount, string dateFormat)
         {
             _consoleExtensions = consoleExtensions;
+            _storeMaxEventCount = storeMaxEventCount;
+            _dateFormat = dateFormat;
         }
 
         public void Initialize(FormPosition formPosition)
@@ -36,12 +39,26 @@ namespace ModbusStatus.UI.Components
         public void AddLog(IEnumerable<IStateEvent> stateEvents)
         {
             _stateEvents.AddRange(stateEvents);
-            _stateEvents = _stateEvents
-                .Skip(Math.Max(0, _stateEvents.Count() - MAX_EVENT_COUNT))
+
+            if (_stateEvents.Count() > _storeMaxEventCount)
+            {
+                _stateEvents = _stateEvents
+                .Skip(Math.Max(0, _stateEvents.Count() - _storeMaxEventCount))
                 .ToList();
-
+            }
+            
             ClearLog();
+            WriteLog();
+        }
 
+        private void ClearLog()
+        {
+            _consoleExtensions.ClearBox(_logTextForm.ContentLeft, _logTextForm.ContentTop,
+                _logTextForm.ContentWidth, _logTextForm.ContentHeight);
+        }
+
+        private void WriteLog()
+        {
             var numberOfLogsToShow = _logTextForm.ContentHeight;
             var displayEvents = _stateEvents.TakeLast(numberOfLogsToShow).ToList();
 
@@ -49,14 +66,8 @@ namespace ModbusStatus.UI.Components
             {
                 var stateEvent = displayEvents[i];
                 Console.SetCursorPosition(_logTextForm.ContentLeft, _logTextForm.ContentTop + i);
-                Console.Write($"{stateEvent.Date.ToString(LOG_DATE_FORMAT)} {stateEvent.Message}");
+                Console.Write($"{stateEvent.Date.ToString(_dateFormat)} {stateEvent.Message}");
             }
-        }
-
-        private void ClearLog()
-        {
-            _consoleExtensions.ClearBox(_logTextForm.ContentLeft, _logTextForm.ContentTop,
-                _logTextForm.ContentWidth, _logTextForm.ContentHeight);
         }
     }
 }

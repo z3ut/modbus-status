@@ -7,6 +7,8 @@ using ModbusStatus.UI.Components;
 using ModbusStatus.UI.Shared.WindowBorders;
 using ModbusStatus.UI.Shared;
 using System;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 
 namespace ModbusStatus
 {
@@ -32,25 +34,44 @@ namespace ModbusStatus
 
         static IServiceProvider BuildServiceProvider()
         {
-            IServiceCollection services = new ServiceCollection();
+            var serviceCollection = new ServiceCollection();
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.Populate(serviceCollection);
 
-            services.AddTransient<IDeviceCurrentState, DeviceCurrentState>();
-            services.AddTransient<IStateMonitor, StateMonitor>();
+
+            containerBuilder.RegisterType<DeviceCurrentState>().As<IDeviceCurrentState>();
+            containerBuilder.RegisterType<StateMonitor>().As<IStateMonitor>();
+
 #if DEBUG
-            services.AddTransient<IDeviceStateReader, DeviceStateReaderMoq>();
+            containerBuilder.RegisterType<DeviceStateReaderMoq>().As<IDeviceStateReader>();
 #else
-            services.AddTransient<IDeviceStateReader, DeviceStateReader>();
+            containerBuilder.RegisterType<DeviceStateReader>().As<IDeviceStateReader>();
 #endif
-            services.AddTransient<IStateDisplay, StateDisplay>();
 
-            services.AddTransient<ILogComponent, LogComponent>();
-            services.AddTransient<IValuesComponent, ValuesComponent>();
-            services.AddTransient<IStatusComponent, StatusComponent>();
+            containerBuilder.RegisterType<StateDisplay>().As<IStateDisplay>();
 
-            services.AddTransient<IWindowBorders, WindowBorderFancy>();
-            services.AddTransient<IConsoleExtensions, ConsoleExtensions>();
+            containerBuilder.RegisterType<LogComponent>().As<ILogComponent>()
+                .WithParameter("storeMaxEventCount", 100)
+                .WithParameter("dateFormat", "yyyy-dd-MM HH.mm.ss");
 
-            return services.BuildServiceProvider();
+            containerBuilder.RegisterType<ValuesComponent>().As<IValuesComponent>()
+                .WithParameter("valueColor", ConsoleColor.DarkMagenta)
+                .WithParameter("valueBackgroundColor", ConsoleColor.DarkYellow);
+
+            containerBuilder.RegisterType<StatusComponent>().As<IStatusComponent>()
+                .WithParameter("onlineColor", ConsoleColor.Green)
+                .WithParameter("onlineBackgroundColor", ConsoleColor.DarkGreen)
+                .WithParameter("offlineColor", ConsoleColor.Gray)
+                .WithParameter("offlineBackgroundColor", ConsoleColor.DarkGray);
+
+            containerBuilder.RegisterType<WindowBorderFancy>().As<IWindowBorders>();
+            containerBuilder.RegisterType<ConsoleExtensions>().As<IConsoleExtensions>();
+
+
+            var container = containerBuilder.Build();
+            var serviceProvider = new AutofacServiceProvider(container);
+
+            return serviceProvider;
         }
     }
 }
